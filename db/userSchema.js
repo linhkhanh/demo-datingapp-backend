@@ -2,8 +2,11 @@ const schema = {
 	validator: {
 		$jsonSchema: {
 			properties: {
-				name: {
+				userName: {
                     type: "string"
+                },
+                email: {
+                    type: 'string'
                 },
                 gender: {
                     type: "string"
@@ -19,8 +22,14 @@ const schema = {
                 },
                 location: {
                     type: "string"
+                },
+                password: {
+                    type: "string"
                 }
-			}
+            },
+            required: [
+                "userName", "email", "password", "gender", "image", "age"
+            ]
 		}
 	}
 }
