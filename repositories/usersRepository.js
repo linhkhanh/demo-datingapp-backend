@@ -23,6 +23,10 @@ module.exports = {
         const [result] = await doFindMany({ _id: ObjectId(id) });
         return result;
     },
+    async getOneByEmail (email) {
+        const [result] = await doFindMany({email: email});
+        return result;
+    },
     findAll () {
         return doFindMany({});
     },
