@@ -7,10 +7,11 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 const cors = require('cors');
 
+
 app.use(bodyParser.json());
 app.use(methodOverride('_method'));
 app.use(session({ secret: 'randomsecret' })); // USE SESSION TO LOGIN/LOGOUT
-app.use(cors());
+app.use(cors({ origin: process.env.FRONT_END_URL || 'http://localhost:3000', credentials: true }));
 app.use(express.urlencoded({ extended: false }));
 
 require('./router')(app);

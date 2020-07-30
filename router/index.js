@@ -1,4 +1,5 @@
 const usersController = require('../controllers/usersController');
+const sessionController = require('../controllers/session');
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
@@ -11,6 +12,7 @@ cloudinary.config({
 
 module.exports = app => {
     app.get('/', usersController.getAll);
+    app.get('/logout', sessionController.logOut);
     app.get('/:id', usersController.getById);
     app.post('/', usersController.create);
     app.put('/:id', usersController.updateById);
@@ -18,4 +20,6 @@ module.exports = app => {
 
     // upload avata
     app.post('/avatar-upload', upload.single('file'), usersController.uploadAvatar);
+    // login-submit
+    app.post('/login_submit', sessionController.loginSubmit);
 };
