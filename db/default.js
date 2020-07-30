@@ -12,6 +12,7 @@ module.exports = {
         console.log('Connected to Mongo');
         const db = connection.db(DB_NAME);
         await db.createCollection(COLLECTION_NAME, userSchema);
+        db.collection(COLLECTION_NAME).createIndex({"email": 1}, {unique: true});
         this[COLLECTION_NAME] = db.collection(COLLECTION_NAME);
     },
     disconnect () {
