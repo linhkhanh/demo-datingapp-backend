@@ -14,7 +14,7 @@ module.exports = {
                 httpResponseFormatter.formatOkResponse(res, user);
             } else {
                 httpResponseFormatter.formatOkResponse(res, {
-                    err: "user doesn't exist"
+                    err: "password is wrong"
                 });
             }
         } catch (err) {

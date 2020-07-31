@@ -25,6 +25,7 @@ module.exports = {
     },
     async getOneByEmail (email) {
         const [result] = await doFindMany({email: email});
+        if (!result) throw new Error(`User with email '${email}' does not exist`);
         return result;
     },
     findAll () {
