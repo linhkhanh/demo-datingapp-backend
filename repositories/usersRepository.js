@@ -36,5 +36,38 @@ module.exports = {
             _id: ObjectId(id),
         });
         return !!result.n;
+    },
+    async likeUser (currentUserId, likedUser) {
+        const result = await db.users.findOneAndUpdate(
+            { _id: ObjectId(currentUserId) },
+            { $addToSet: { likes: likedUser._id }},
+            { returnNewDocument: true }
+            );
+        // if (!result) {
+        //     console.log('waiting for result');
+        //     await result;
+        // } else {
+        //     // Do Matching
+
+        //     const likedUsers = await db.users.findOne(
+        //         { _id: ObjectId(currentUserId) },
+        //         { projection: {_id:0, likes:1}}
+        //         );
+        //     let likedUsersArray = likedUsers.likes;
+        //     const matchResult = await this.findMatch(currentUserId, likedUsersArray);
+
+        // }
+        return result;
+        
+    },
+    async findMatch(currentUserId, likedUsers) {
+        // let likedUserObjectIds = likedUsers.map(user => {return ObjectId(user)});
+        // console.log(likedUserObjectIds);
+        // // console.log(likedUserObjectIds);
+        // const result = await db.users.find(
+        //     { _id: { $in: likedUserObjectIds }},
+        //     { projection: { likes: 1 }}
+        // ).toArray();
+        // console.log(result);
     }
 };
