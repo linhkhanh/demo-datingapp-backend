@@ -2,6 +2,7 @@ const usersRepository = require('../repositories/usersRepository');
 const httpResponseFormatter = require('../formatters/httpResponse');
 const cloudinary = require('cloudinary').v2;
 const bcrypt = require('bcrypt');
+const { likeUser } = require('../repositories/usersRepository');
 
 module.exports = {
     async getAll(req, res) {
@@ -52,5 +53,11 @@ module.exports = {
             console.log(error);
         }
 
+    },
+    async likeUser(req, res) {
+        const isUpdateSuccessful = await usersRepository.likeUser(req.params.id, req.body);
+        httpResponseFormatter.formatOkResponse(res, {
+            isUpdateSuccessful,
+        });
     }
 };

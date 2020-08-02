@@ -24,5 +24,8 @@ module.exports = app => {
     app.post('/avatar-upload', upload.single('file'), usersController.uploadAvatar);
     // login-submit
     app.post('/login_submit', sessionController.loginSubmit);
+
+    // like another user
+    app.put('/like/:id', usersController.likeUser);
     
 };
