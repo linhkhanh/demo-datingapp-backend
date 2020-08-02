@@ -8,9 +8,7 @@ module.exports = {
         try {
             const user = await usersRepository.getOneByEmail(req.body.email);
             if (bcrypt.compareSync(req.body.password, user.password)) {
-                console.log(user);
                 req.session.userId = user._id;
-                console.log(req.session);
                 httpResponseFormatter.formatOkResponse(res, user);
             } else {
                 httpResponseFormatter.formatOkResponse(res, {
@@ -33,5 +31,12 @@ module.exports = {
                 user: "log out"
             });
         })
+    },
+    checkAuthentication (req, res) {
+        req.session.userId ? httpResponseFormatter.formatOkResponse(res, {
+            isLogIn: true
+        }) : httpResponseFormatter.formatOkResponse(res, {
+            isLogIn: false
+        });
     }
 }

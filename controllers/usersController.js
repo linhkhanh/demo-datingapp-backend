@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 
 module.exports = {
     async getAll(req, res) {
-        console.log(req.session);
         if (req.session.userId) {
             const users = await usersRepository.findAll();
             httpResponseFormatter.formatOkResponse(res, users);

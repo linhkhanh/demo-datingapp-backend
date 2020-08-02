@@ -13,6 +13,8 @@ cloudinary.config({
 module.exports = app => {
     app.get('/', usersController.getAll);
     app.get('/logout', sessionController.logOut);
+    // check Authentication
+    app.get('/check_authentication', sessionController.checkAuthentication);
     app.get('/:id', usersController.getById);
     app.post('/', usersController.create);
     app.put('/:id', usersController.updateById);
@@ -22,4 +24,5 @@ module.exports = app => {
     app.post('/avatar-upload', upload.single('file'), usersController.uploadAvatar);
     // login-submit
     app.post('/login_submit', sessionController.loginSubmit);
+    
 };
