@@ -60,14 +60,22 @@ module.exports = {
         return result;
         
     },
-    async findMatch(currentUserId, likedUsers) {
-        // let likedUserObjectIds = likedUsers.map(user => {return ObjectId(user)});
-        // console.log(likedUserObjectIds);
-        // // console.log(likedUserObjectIds);
-        // const result = await db.users.find(
-        //     { _id: { $in: likedUserObjectIds }},
-        //     { projection: { likes: 1 }}
-        // ).toArray();
-        // console.log(result);
+    async findMatch(currentUserId, likedUser) {
+        // console.log(`liked user is` + likedUser)
+        let likedUserObjectId = ObjectId(likedUser);
+        let isUserLikedBack = false;
+        const result = await db.users.findOne(
+            { _id: likedUserObjectId },
+            { projection: { likes: 1, _id: 0, userName: 1}}
+        );
+        // console.log(result.likes);
+        result.likes.forEach((user) => {
+            if (user === currentUserId) {
+                isUserLikedBack = true;
+            }
+        });
+        // console.log(isUserLikedBack);
+        console.log(result.userName)
+        return { userName: result.userName, isUserLikedBack }
     }
 };
