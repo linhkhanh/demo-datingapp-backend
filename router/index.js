@@ -4,6 +4,7 @@ const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
+
 cloudinary.config({
     cloud_name: 'dt5rqi1l9',
     api_key: '552321872584896',
@@ -13,10 +14,19 @@ cloudinary.config({
 module.exports = app => {
     app.get('/', usersController.getAll);
     app.get('/logout', sessionController.logOut);
+
+    
     // check Authentication
     app.get('/check_authentication', sessionController.checkAuthentication);
+
+    
+
     app.get('/:id', usersController.getById);
     app.post('/', usersController.create);
+
+    app.post('/get_data_fb', sessionController.getDataFacebook);
+    app.post('/log_in_with_fb', sessionController.logInWithFacebookSubmit);
+
     app.put('/:id', usersController.updateById);
     app.delete('/:id', usersController.deleteById);
 
@@ -27,5 +37,5 @@ module.exports = app => {
 
     // like another user
     app.put('/like/:id', usersController.likeUser);
-    
+
 };

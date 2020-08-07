@@ -1,6 +1,7 @@
 const usersRepository = require('../repositories/usersRepository');
 const httpResponseFormatter = require('../formatters/httpResponse');
 const bcrypt = require('bcrypt');
+const axios = require('axios');
 
 // EXPORT
 module.exports = {
@@ -34,9 +35,32 @@ module.exports = {
     },
     checkAuthentication (req, res) {
         req.session.userId ? httpResponseFormatter.formatOkResponse(res, {
-            isLogIn: true
+            isLogIn: true 
         }) : httpResponseFormatter.formatOkResponse(res, {
             isLogIn: false
         });
+    },
+    async getDataFacebook (req, res) {
+        const { data } = await axios({
+            url: 'https://graph.facebook.com/me',
+            method: 'get',
+            params: {
+              fields: ['email', 'first_name', 'last_name'].join(','),
+              access_token: req.body.accessToken,
+            },
+          });
+          httpResponseFormatter.formatOkResponse(res, data);
+    },
+    async logInWithFacebookSubmit (req, res) {
+        try {
+            const user = await usersRepository.getOneByEmail(req.body.email);
+                req.session.userId = user._id;
+                httpResponseFormatter.formatOkResponse(res, user);
+        } catch (err) {
+            console.log(err);
+            httpResponseFormatter.formatOkResponse(res, {
+                err: err.message
+            });
+        }
     }
 }
