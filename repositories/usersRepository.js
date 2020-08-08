@@ -73,26 +73,38 @@ module.exports = {
     },
     async findMatch(currentUserId, likedUser) {
         const action = "match";
-        const likedUserObjectId = ObjectId(likedUser);
         let isUserLikedBack = false;
 
         const result = await db.users.findOne(
-            { _id: likedUserObjectId },
+            { _id: ObjectId(likedUser) },
             { projection: { likes: 1, userName: 1, image: 1}}
         );
 
-        const resultNotification = {
+        // Get current user name and image
+        const currentUserResult = await db.users.findOne(
+            { _id: ObjectId(currentUserId) },
+            { projection: { userName:1, image: 1 }}
+        );
+
+        const currentUserNotification = {
             _id: result._id,
             userName: result.userName
         }
-        
+
+        const likedUserNotification = {
+            _id: currentUserResult._id,
+            userName: currentUserResult.userName
+        }
+
         result.likes.forEach((user) => {
             if (user === currentUserId) {
                 isUserLikedBack = true;
-                this.updateNotifications(ObjectId(currentUserId), action, resultNotification);
+                this.updateNotifications(ObjectId(currentUserId), action, currentUserNotification);
+                this.updateNotifications(ObjectId(likedUser),action, likedUserNotification);
             }
         });
         return { 
+            currentUserImage: currentUserResult.image,
             userName: result.userName,
             _id: result._id,
             image: result.image,

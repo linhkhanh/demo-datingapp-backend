@@ -32,16 +32,22 @@ const connections = [];
 
 io.on('connection', (socket) => {
     console.log('New client connected');
-    socket.on('press', () => {
-        socket.emit('press', 'This message is from the server')
-    });
+    // socket.on('press', () => {
+    //     socket.emit('press', 'This message is from the server')
+    // });
+    socket.on('join', (data) => {
+        console.log(data.id);
+        socket.join(data.id);
+        
+    })
     socket.on('checkMatch', async (data) => {
         // Cmmect to Mongo and check
         // console.log(data);
         const response = await usersController.matchUser(data.currentUserId, data.likedUserId);
         // console.log(response);
         if (response.isUserLikedBack === true) {
-            socket.emit('matched', response);
+            io.sockets.in(data.currentUserId).emit('matched', response);
+            io.sockets.in(data.likedUserId).emit('matched', response);
         }
     })
     socket.on('disconnect', () => console.log("Client disconnected"));  
