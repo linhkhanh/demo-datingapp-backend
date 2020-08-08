@@ -66,7 +66,7 @@ module.exports = {
         let isUserLikedBack = false;
         const result = await db.users.findOne(
             { _id: likedUserObjectId },
-            { projection: { likes: 1, _id: 0, userName: 1}}
+            { projection: { likes: 1, userName: 1, image: 1}}
         );
         // console.log(result.likes);
         result.likes.forEach((user) => {
@@ -75,7 +75,11 @@ module.exports = {
             }
         });
         // console.log(isUserLikedBack);
-        console.log(result.userName)
-        return { userName: result.userName, isUserLikedBack }
+        console.log(result)
+        return { 
+            userName: result.userName,
+            _id: result._id,
+            image: result.image,
+            isUserLikedBack }
     }
 };

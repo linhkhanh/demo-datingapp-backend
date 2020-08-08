@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
         const response = await usersController.matchUser(data.currentUserId, data.likedUserId);
         // console.log(response);
         if (response.isUserLikedBack === true) {
-            socket.emit('matched', response.userName);
+            socket.emit('matched', response);
         }
     })
     socket.on('disconnect', () => console.log("Client disconnected"));  
