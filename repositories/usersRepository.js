@@ -38,9 +38,20 @@ module.exports = {
         return !!result.n;
     },
     async likeUser (currentUserId, likedUser) {
+        const likedUserObject = await db.users.findOne(
+            { _id: ObjectId(likedUser._id)},
+            {projection: {userName: 1}}
+        )
+
         const result = await db.users.findOneAndUpdate(
             { _id: ObjectId(currentUserId) },
-            { $addToSet: { likes: likedUser._id }},
+            { $addToSet: { 
+                likes: likedUser._id , 
+                notifications: {
+                    type: "like",
+                    target: likedUserObject,
+                }
+            }},
             { returnNewDocument: true }
             );
         // if (!result) {
@@ -61,25 +72,43 @@ module.exports = {
         
     },
     async findMatch(currentUserId, likedUser) {
-        // console.log(`liked user is` + likedUser)
-        let likedUserObjectId = ObjectId(likedUser);
+        const action = "match";
+        const likedUserObjectId = ObjectId(likedUser);
         let isUserLikedBack = false;
+
         const result = await db.users.findOne(
             { _id: likedUserObjectId },
             { projection: { likes: 1, userName: 1, image: 1}}
         );
-        // console.log(result.likes);
+
+        const resultNotification = {
+            _id: result._id,
+            userName: result.userName
+        }
+        
         result.likes.forEach((user) => {
             if (user === currentUserId) {
                 isUserLikedBack = true;
+                this.updateNotifications(ObjectId(currentUserId), action, resultNotification);
             }
         });
-        // console.log(isUserLikedBack);
-        console.log(result)
         return { 
             userName: result.userName,
             _id: result._id,
             image: result.image,
             isUserLikedBack }
+    },
+    async updateNotifications(currentUserId, action, payload) {
+        const result = await db.users.findOneAndUpdate(
+            { _id: ObjectId(currentUserId) },
+            { $addToSet: { 
+                notifications: {
+                    type: action,
+                    target: payload,
+                }
+            }},
+            { returnNewDocument: true }
+        );
+        return result;
     }
 };

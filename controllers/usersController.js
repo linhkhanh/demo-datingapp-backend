@@ -55,7 +55,6 @@ module.exports = {
 
     },
     async likeUser(req, res) {
-        console.log(req.params.id + ' likes ' + req.body); // To delete
         const isUpdateSuccessful = await usersRepository.likeUser(req.params.id, req.body);
         httpResponseFormatter.formatOkResponse(res, {
             isUpdateSuccessful,
