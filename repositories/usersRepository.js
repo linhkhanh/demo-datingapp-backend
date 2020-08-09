@@ -38,9 +38,20 @@ module.exports = {
         return !!result.n;
     },
     async likeUser (currentUserId, likedUser) {
+        const likedUserObject = await db.users.findOne(
+            { _id: ObjectId(likedUser._id)},
+            {projection: {userName: 1}}
+        )
+
         const result = await db.users.findOneAndUpdate(
             { _id: ObjectId(currentUserId) },
-            { $addToSet: { likes: likedUser._id }},
+            { $addToSet: { 
+                likes: likedUser._id , 
+                notifications: {
+                    type: "like",
+                    target: likedUserObject,
+                }
+            }},
             { returnNewDocument: true }
             );
         // if (!result) {
@@ -60,14 +71,58 @@ module.exports = {
         return result;
         
     },
-    async findMatch(currentUserId, likedUsers) {
-        // let likedUserObjectIds = likedUsers.map(user => {return ObjectId(user)});
-        // console.log(likedUserObjectIds);
-        // // console.log(likedUserObjectIds);
-        // const result = await db.users.find(
-        //     { _id: { $in: likedUserObjectIds }},
-        //     { projection: { likes: 1 }}
-        // ).toArray();
-        // console.log(result);
+    async findMatch(currentUserId, likedUser) {
+        const action = "match";
+        let isUserLikedBack = false;
+
+        const result = await db.users.findOne(
+            { _id: ObjectId(likedUser) },
+            { projection: { likes: 1, userName: 1, image: 1}}
+        );
+
+        // Get current user name and image
+        const currentUserResult = await db.users.findOne(
+            { _id: ObjectId(currentUserId) },
+            { projection: { userName:1, image: 1 }}
+        );
+
+        const currentUserNotification = {
+            _id: result._id,
+            userName: result.userName
+        }
+
+        const likedUserNotification = {
+            _id: currentUserResult._id,
+            userName: currentUserResult.userName
+        }
+
+        result.likes.forEach((user) => {
+            if (user === currentUserId) {
+                isUserLikedBack = true;
+                this.updateNotifications(ObjectId(currentUserId), action, currentUserNotification);
+                this.updateNotifications(ObjectId(likedUser),action, likedUserNotification);
+            }
+        });
+        return { 
+            currentUserName: currentUserResult.userName,
+            currentUserImage: currentUserResult.image,
+            currentUserId: currentUserId,
+            likedUserName: result.userName,
+            likedUserImage: result.image,
+            likedUserId: result._id,
+            isUserLikedBack }
+    },
+    async updateNotifications(currentUserId, action, payload) {
+        const result = await db.users.findOneAndUpdate(
+            { _id: ObjectId(currentUserId) },
+            { $addToSet: { 
+                notifications: {
+                    type: action,
+                    target: payload,
+                }
+            }},
+            { returnNewDocument: true }
+        );
+        return result;
     }
 };

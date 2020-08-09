@@ -59,5 +59,9 @@ module.exports = {
         httpResponseFormatter.formatOkResponse(res, {
             isUpdateSuccessful,
         });
+    },
+    async matchUser(currentUser, likedUser) {
+        const isUserMatched = await usersRepository.findMatch(currentUser, likedUser);
+        return isUserMatched;
     }
 };

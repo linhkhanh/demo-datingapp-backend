@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const session = require('express-session');
 const cors = require('cors');
+const { ObjectId } = require('mongodb');
+const usersController = require('./controllers/usersController');
 
 
 app.use(bodyParser.json());
@@ -18,7 +20,50 @@ require('./router')(app);
 
 if (process.env.NODE_ENV !== 'test') {
     db.connect();
-    app.listen(PORT, () => console.log(`Server started at port ${PORT}`));
 }
+
+const server = app.listen(PORT, () => console.log(`Server started at port ${PORT}`));
+
+// Socket IO
+
+const io = require('socket.io')(server);
+const users = [];
+const connections = [];
+
+io.on('connection', (socket) => {
+    console.log('New client connected');
+    // socket.on('press', () => {
+    //     socket.emit('press', 'This message is from the server')
+    // });
+    socket.on('join', (data) => {
+        console.log(data.id);
+        socket.join(data.id);
+        
+    })
+    socket.on('checkMatch', async (data) => {
+        // Cmmect to Mongo and check
+        // console.log(data);
+        const response = await usersController.matchUser(data.currentUserId, data.likedUserId);
+        // console.log(response);
+        if (response.isUserLikedBack === true) {
+            // Send modal content to both users
+            io.sockets.in(data.currentUserId).emit('matched', 
+            {
+                currentUserImage: response.currentUserImage,
+                otherUserName: response.likedUserName,
+                otherUserImage: response.likedUserImage,
+                otherUserId: response.likedUserId
+            });
+            io.sockets.in(data.likedUserId).emit('matched', 
+            {
+                currentUserImage: response.likedUserImage,
+                otherUserName: response.currentUserName,
+                otherUserImage: response.currentUserImage,
+                otherUserId: response.currentUserId
+            });
+        }
+    })
+    socket.on('disconnect', () => console.log("Client disconnected"));  
+})
 
 module.exports = app;
