@@ -104,10 +104,12 @@ module.exports = {
             }
         });
         return { 
+            currentUserName: currentUserResult.userName,
             currentUserImage: currentUserResult.image,
-            userName: result.userName,
-            _id: result._id,
-            image: result.image,
+            currentUserId: currentUserId,
+            likedUserName: result.userName,
+            likedUserImage: result.image,
+            likedUserId: result._id,
             isUserLikedBack }
     },
     async updateNotifications(currentUserId, action, payload) {

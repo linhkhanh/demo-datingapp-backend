@@ -46,8 +46,21 @@ io.on('connection', (socket) => {
         const response = await usersController.matchUser(data.currentUserId, data.likedUserId);
         // console.log(response);
         if (response.isUserLikedBack === true) {
-            io.sockets.in(data.currentUserId).emit('matched', response);
-            io.sockets.in(data.likedUserId).emit('matched', response);
+            // Send modal content to both users
+            io.sockets.in(data.currentUserId).emit('matched', 
+            {
+                currentUserImage: response.currentUserImage,
+                otherUserName: response.likedUserName,
+                otherUserImage: response.likedUserImage,
+                otherUserId: response.likedUserId
+            });
+            io.sockets.in(data.likedUserId).emit('matched', 
+            {
+                currentUserImage: response.likedUserImage,
+                otherUserName: response.currentUserName,
+                otherUserImage: response.currentUserImage,
+                otherUserId: response.currentUserId
+            });
         }
     })
     socket.on('disconnect', () => console.log("Client disconnected"));  
