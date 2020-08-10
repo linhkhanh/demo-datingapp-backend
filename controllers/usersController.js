@@ -32,10 +32,9 @@ module.exports = {
         
     },
     async updateById(req, res) {
-        const isUpdateSuccessful = await usersRepository.updateById(req.params.id, req.body);
-        httpResponseFormatter.formatOkResponse(res, {
-            isUpdateSuccessful,
-        });
+        // const isUpdateSuccessful = await usersRepository.updateById(req.params.id, req.body);
+        const result = await usersRepository.updateById(req.params.id, req.body);
+        httpResponseFormatter.formatOkResponse(res, result);
     },
     async deleteById(req, res) {
         const isDeleteSuccessful = await usersRepository.deleteById(req.params.id);
