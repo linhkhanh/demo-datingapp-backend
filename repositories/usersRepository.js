@@ -13,11 +13,18 @@ module.exports = {
         return newOne;
     },
     async updateById (id, newData) {
-        const { result } = await db.users.updateOne(
+        // const { result } = await db.users.updateOne(
+        //     { _id: ObjectId(id) },
+        //     { $set: newData }
+        // );
+        // return !!result.nModified;
+        const result = await db.users.findOneAndUpdate(
             { _id: ObjectId(id) },
-            { $set: newData }
+            { $set: newData },
+            { returnNewDocument: true }
         );
-        return !!result.nModified;
+        console.log(result);
+        return { result: result.lastErrorObject, updatedDocument: result.value };
     },
     async findById (id) {
         const [result] = await doFindMany({ _id: ObjectId(id) });
