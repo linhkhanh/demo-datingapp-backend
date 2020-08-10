@@ -20,9 +20,16 @@ module.exports = {
         httpResponseFormatter.formatOkResponse(res, oneUser);
     },
     async create(req, res) {
-        req.body.password = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10));
-        const newUser = await usersRepository.create(req.body);
-        httpResponseFormatter.formatOkResponse(res, newUser);
+        try {
+            req.body.password = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10));
+            const newUser = await usersRepository.create(req.body);
+            httpResponseFormatter.formatOkResponse(res, newUser);
+        } catch (err) {
+            httpResponseFormatter.formatOkResponse(res, {
+                err: "This email is used already. Please use another one."
+            });
+        }
+        
     },
     async updateById(req, res) {
         const isUpdateSuccessful = await usersRepository.updateById(req.params.id, req.body);
