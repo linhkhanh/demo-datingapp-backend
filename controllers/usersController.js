@@ -76,13 +76,16 @@ module.exports = {
         try {
             const user = await usersRepository.getOneByEmail(req.body.email);
             console.log('Req body', req.body);
-            const randomPassword = Math.random().toString(36).slice(-12);
+            const randomPassword = Math.random().toString(36).slice(-10);
             const encryptedNewPassword = bcrypt.hashSync(randomPassword, bcrypt.genSaltSync(10));
             
-            // Update Password
+            // Update Password and Send Out Password Reset Email
             try {
                 const updatedUser = await usersRepository.updateById(user._id, { password: encryptedNewPassword});
-                httpResponseFormatter.formatOkResponse(res, { message: `Password has been reset successfully: ${randomPassword}`});
+                
+                const response = await usersRepository.sendPasswordResetEmail(req.body.email, randomPassword);
+                console.log(response);
+                httpResponseFormatter.formatOkResponse(res, { message: `Reset Password Email has been sent to ${req.body.email}`});
             } catch(err) {
                 console.log(err);
             }
