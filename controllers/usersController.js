@@ -3,6 +3,7 @@ const httpResponseFormatter = require('../formatters/httpResponse');
 const cloudinary = require('cloudinary').v2;
 const bcrypt = require('bcrypt');
 const { likeUser } = require('../repositories/usersRepository');
+const nodemailer = require('nodemailer');
 
 module.exports = {
     async getAll(req, res) {
@@ -29,7 +30,7 @@ module.exports = {
                 err: "This email is used already. Please use another one."
             });
         }
-        
+
     },
     async updateById(req, res) {
         // const isUpdateSuccessful = await usersRepository.updateById(req.params.id, req.body);
@@ -69,5 +70,29 @@ module.exports = {
     async matchUser(currentUser, likedUser) {
         const isUserMatched = await usersRepository.findMatch(currentUser, likedUser);
         return isUserMatched;
-    }
+    },
+
+    async resetPassword(req, res) {
+        try {
+            const user = await usersRepository.getOneByEmail(req.body.email);
+            console.log('Req body', req.body);
+            const randomPassword = Math.random().toString(36).slice(-10);
+            const encryptedNewPassword = bcrypt.hashSync(randomPassword, bcrypt.genSaltSync(10));
+            
+            // Update Password and Send Out Password Reset Email
+            try {
+                const updatedUser = await usersRepository.updateById(user._id, { password: encryptedNewPassword});
+                
+                const response = await usersRepository.sendPasswordResetEmail(req.body.email, randomPassword);
+                console.log(response);
+                httpResponseFormatter.formatOkResponse(res, { message: `Reset Password Email has been sent to ${req.body.email}`});
+            } catch(err) {
+                console.log(err);
+            }
+        } catch (err) {
+            httpResponseFormatter.formatOkResponse(res, {
+                err: "This email address does not exist."
+            });
+        }
+    },
 };

@@ -1,5 +1,6 @@
 const db = require('../db');
 const { ObjectId } = require('mongodb');
+const nodemailer = require('nodemailer');
 
 const doFindMany = async condition => {
    const data = await db.users.find(condition).toArray()
@@ -131,5 +132,30 @@ module.exports = {
             { returnNewDocument: true }
         );
         return result;
+    },
+    async sendPasswordResetEmail(userEmail, password){
+        const senderEmailAddress = 'datingapprml@gmail.com';
+        let transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: senderEmailAddress,
+                pass: 'RMLgroup!23'
+            }
+        });
+        let mailOptions = {
+            from: senderEmailAddress,
+            to: userEmail,
+            subject: `Dating App - Password Reset For ${userEmail}`,
+            text: 'You are receiving this because you (or someone else) have requested the reset of your account password.' + '\n\n' + `Your new password is: ${password}`
+        };
+
+        try {
+            let info = await transporter.sendMail(mailOptions);
+            console.log('Email sent successfully');
+            return `Password Reset Email sent successfully to ${userEmail}`;
+        } catch(err) {
+            console.log(err);
+        }
+        
     }
 };
