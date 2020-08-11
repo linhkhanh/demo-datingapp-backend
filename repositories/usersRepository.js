@@ -131,5 +131,8 @@ module.exports = {
             { returnNewDocument: true }
         );
         return result;
+    },
+    async sendPasswordResetEmail(){
+        
     }
 };

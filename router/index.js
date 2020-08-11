@@ -13,9 +13,12 @@ cloudinary.config({
 });
 
 module.exports = app => {
+
     app.get('/', usersController.getAll);
     app.get('/logout', sessionController.logOut);
 
+    // User Forgot Password
+    app.post('/forget-password', usersController.resetPassword);
     
     // check Authentication
     app.get('/check_authentication', sessionController.checkAuthentication);
@@ -52,5 +55,7 @@ module.exports = app => {
 
     // like another user
     app.put('/like/:id', usersController.likeUser);
+
+
 
 };
